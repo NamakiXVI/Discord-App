@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation and configuration for Discord application endpoints, linked roles, terms of service, and privacy policy">
+    <meta name="theme-color" content="#0a84ff">
+    <title>Discord App — Developer Console & Links</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header with navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="16" fill="#0a84ff"/>
+                        <path d="M12 10L20 10L20 22L16 18L12 22L12 10Z" fill="white"/>
+                    </svg>
+                    <span>Discord App</span>
+                </div>
+                
+                <nav class="nav" aria-label="Main navigation">
+                    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu">
+                        <span class="hamburger"></span>
+                        <span class="sr-only">Menu</span>
+                    </button>
+                    
+                    <ul class="nav-menu" id="nav-menu">
+                        <li><a href="#/" class="nav-link" data-route="/">Home</a></li>
+                        <li><a href="#/interactions" class="nav-link" data-route="/interactions">Interactions</a></li>
+                        <li><a href="#/linked-roles" class="nav-link" data-route="/linked-roles">Linked Roles</a></li>
+                        <li><a href="#/tos" class="nav-link" data-route="/tos">Terms of Service</a></li>
+                        <li><a href="#/privacy" class="nav-link" data-route="/privacy">Privacy Policy</a></li>
+                        <li><button class="btn btn-primary" id="connect-btn">Connect</button></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content area -->
+    <main id="main-content">
+        <div class="container">
+            <!-- Router view - content changes based on route -->
+            <div id="router-view"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#/interactions">Interactions Endpoint</a>
+                    <a href="#/linked-roles">Linked Roles Verification</a>
+                    <a href="#/tos">Terms of Service</a>
+                    <a href="#/privacy">Privacy Policy</a>
+                </div>
+                <div class="footer-meta">
+                    <p class="copyright">&copy; 2023 {{ORGANIZATION_NAME}}. All rights reserved.</p>
+                    <p><a href="mailto:{{SUPPORT_EMAIL}}">Contact Support</a> | <a href="#accessibility">Accessibility Statement</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Connect Modal -->
+    <div class="modal" id="connect-modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Connect Your Discord App</h2>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>To connect your Discord application:</p>
+                <ol>
+                    <li>Visit the <a href="https://discord.com/developers/applications" target="_blank">Discord Developer Portal</a></li>
+                    <li>Select your application or create a new one</li>
+                    <li>Navigate to the "OAuth2" section</li>
+                    <li>Configure your redirect URIs and copy your Client ID</li>
+                    <li>Use the configuration pages in this dashboard to set up your endpoints</li>
+                </ol>
+                <div class="warning-box">
+                    <strong>Security Notice:</strong> Never share your Client Secret or Bot Token publicly. All secrets should be stored securely on your server.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <script src="app.js"></script>
+</body>
+</html>
