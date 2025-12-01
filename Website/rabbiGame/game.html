@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subway Rabbi - The Kosher Runner</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Game Header -->
+        <header class="game-header">
+            <div class="logo">
+                <i class="fas fa-star-of-david"></i>
+                <h1>SUBWAY RABBI</h1>
+                <i class="fas fa-torah"></i>
+            </div>
+            <div class="subtitle">The Kosher Runner</div>
+        </header>
+
+        <!-- Game UI -->
+        <div class="game-ui">
+            <div class="score-container">
+                <div class="score-display">
+                    <i class="fas fa-coins"></i>
+                    <span id="score">0</span>
+                </div>
+                <div class="high-score">
+                    <i class="fas fa-crown"></i>
+                    <span id="high-score">0</span>
+                </div>
+            </div>
+            
+            <div class="controls-info">
+                <div class="control-item">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Left</span>
+                </div>
+                <div class="control-item">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Right</span>
+                </div>
+                <div class="control-item">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Jump</span>
+                </div>
+                <div class="control-item">
+                    <i class="fas fa-space-bar"></i>
+                    <span>Pause</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Canvas -->
+        <div class="game-area">
+            <canvas id="game-canvas" width="800" height="400"></canvas>
+            
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen">
+                <div class="screen-content">
+                    <h2>Mazel Tov!</h2>
+                    <p>Help Rabbi Mendel collect gold coins for the synagogue!</p>
+                    <p>Avoid the <span class="obstacle-text">bagels</span> and <span class="obstacle-text">challahs</span>!</p>
+                    <div class="character-display">
+                        <div class="rabbi-sprite"></div>
+                    </div>
+                    <button id="start-btn" class="btn">
+                        <i class="fas fa-play"></i> START GAME
+                    </button>
+                    <button id="instructions-btn" class="btn btn-secondary">
+                        <i class="fas fa-question-circle"></i> HOW TO PLAY
+                    </button>
+                    <div class="game-tip">
+                        <i class="fas fa-lightbulb"></i> Tip: Collect 100 coins for a special blessing!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pause Screen -->
+            <div id="pause-screen" class="screen hidden">
+                <div class="screen-content">
+                    <h2>Shabbat Shalom!</h2>
+                    <p>Game is paused</p>
+                    <button id="resume-btn" class="btn">
+                        <i class="fas fa-play"></i> RESUME
+                    </button>
+                    <button id="restart-btn" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> RESTART
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="gameover-screen" class="screen hidden">
+                <div class="screen-content">
+                    <h2>Oy Vey!</h2>
+                    <p>Rabbi Mendel has been delayed!</p>
+                    <div class="final-score">
+                        <div class="score-label">Your Score:</div>
+                        <div class="score-value" id="final-score">0</div>
+                    </div>
+                    <div class="high-score-display" id="new-high-score" style="display: none;">
+                        <i class="fas fa-trophy"></i> NEW HIGH SCORE!
+                    </div>
+                    <button id="play-again-btn" class="btn">
+                        <i class="fas fa-redo"></i> PLAY AGAIN
+                    </button>
+                    <button id="menu-btn" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> MAIN MENU
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions Screen -->
+            <div id="instructions-screen" class="screen hidden">
+                <div class="screen-content">
+                    <h2>How To Play</h2>
+                    <div class="instructions">
+                        <div class="instruction-item">
+                            <div class="instruction-icon">
+                                <i class="fas fa-arrows-alt-h"></i>
+                            </div>
+                            <div class="instruction-text">
+                                <h3>Move Left/Right</h3>
+                                <p>Use <strong>Arrow Keys</strong> or <strong>A/D Keys</strong> to switch between the three lanes</p>
+                            </div>
+                        </div>
+                        <div class="instruction-item">
+                            <div class="instruction-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="instruction-text">
+                                <h3>Jump</h3>
+                                <p>Press <strong>Spacebar</strong> or <strong>W/Up Arrow</strong> to jump over obstacles</p>
+                            </div>
+                        </div>
+                        <div class="instruction-item">
+                            <div class="instruction-icon">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="instruction-text">
+                                <h3>Collect Coins</h3>
+                                <p>Gather gold coins to increase your score. Every 10 coins gives you a blessing!</p>
+                            </div>
+                        </div>
+                        <div class="instruction-item">
+                            <div class="instruction-icon">
+                                <i class="fas fa-running"></i>
+                            </div>
+                            <div class="instruction-text">
+                                <h3>Survive</h3>
+                                <p>Avoid the bagels, challahs, and Torah scrolls. The game gets faster over time!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="back-btn" class="btn">
+                        <i class="fas fa-arrow-left"></i> BACK TO MENU
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div class="mobile-controls">
+            <div class="controls-row">
+                <button id="left-btn" class="control-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button id="jump-btn" class="control-btn jump-btn">
+                    <i class="fas fa-arrow-up"></i> JUMP
+                </button>
+                <button id="right-btn" class="control-btn">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            <div class="controls-row">
+                <button id="pause-mobile-btn" class="control-btn pause-btn">
+                    <i class="fas fa-pause"></i> PAUSE
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Stats -->
+        <div class="game-stats">
+            <div class="stat">
+                <i class="fas fa-running"></i>
+                <div>
+                    <div class="stat-label">Distance</div>
+                    <div class="stat-value" id="distance">0m</div>
+                </div>
+            </div>
+            <div class="stat">
+                <i class="fas fa-bolt"></i>
+                <div>
+                    <div class="stat-label">Speed</div>
+                    <div class="stat-value" id="speed">1x</div>
+                </div>
+            </div>
+            <div class="stat">
+                <i class="fas fa-star"></i>
+                <div>
+                    <div class="stat-label">Blessings</div>
+                    <div class="stat-value" id="blessings">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Footer -->
+        <footer class="game-footer">
+            <p>This game is a satirical tribute to religious themes. All stereotypes are meant in good fun.</p>
+            <div class="footer-links">
+                <button id="theme-toggle">
+                    <i class="fas fa-moon"></i> <span>Dark Mode</span>
+                </button>
+                <button id="sound-toggle">
+                    <i class="fas fa-volume-up"></i> <span>Sound On</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="coin-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1998.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="jump-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-player-jumping-in-a-video-game-2043.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="collision-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-video-game-retro-click-237.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="blessing-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="background-music" loop preload="auto">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-hava-nagila-150.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="game.js"></script>
+</body>
+</html>
