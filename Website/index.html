@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Documentation and configuration for Discord application endpoints, linked roles, terms of service, and privacy policy">
-    <meta name="theme-color" content="#0a84ff">
-    <title>Discord App — Developer Console & Links</title>
+    <meta name="description" content="Documentation for AI Discord Bot with PuterClient integration, logging, and multiple AI models">
+    <meta name="theme-color" content="#7289da">
+    <title>AI Discord Bot — Developer Console</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Skip to main content for accessibility -->
@@ -17,11 +20,11 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="16" cy="16" r="16" fill="#0a84ff"/>
-                        <path d="M12 10L20 10L20 22L16 18L12 22L12 10Z" fill="white"/>
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 36C27.9411 36 36 27.9411 36 18C36 8.05887 27.9411 0 18 0C8.05887 0 0 8.05887 0 18C0 27.9411 8.05887 36 18 36Z" fill="#7289DA"/>
+                        <path d="M28 14.5H22.5V9H13.5V14.5H8V25.5H13.5V31H22.5V25.5H28V14.5ZM22.5 25.5H13.5V19.5H10.5V17H13.5V14.5H22.5V17H25.5V19.5H22.5V25.5Z" fill="white"/>
                     </svg>
-                    <span>Discord App</span>
+                    <span>AI Discord Bot</span>
                 </div>
                 
                 <nav class="nav" aria-label="Main navigation">
@@ -33,10 +36,11 @@
                     <ul class="nav-menu" id="nav-menu">
                         <li><a href="#/" class="nav-link" data-route="/">Home</a></li>
                         <li><a href="#/interactions" class="nav-link" data-route="/interactions">Interactions</a></li>
-                        <li><a href="#/linked-roles" class="nav-link" data-route="/linked-roles">Linked Roles</a></li>
+                        <li><a href="#/features" class="nav-link" data-route="/features">Bot Features</a></li>
+                        <li><a href="#/models" class="nav-link" data-route="/models">AI Models</a></li>
                         <li><a href="#/tos" class="nav-link" data-route="/tos">Terms of Service</a></li>
                         <li><a href="#/privacy" class="nav-link" data-route="/privacy">Privacy Policy</a></li>
-                        <li><button class="btn btn-primary" id="connect-btn">Connect</button></li>
+                        <li><button class="btn btn-primary" id="connect-btn">Invite Bot</button></li>
                     </ul>
                 </nav>
             </div>
@@ -56,37 +60,42 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-links">
-                    <a href="#/interactions">Interactions Endpoint</a>
-                    <a href="#/linked-roles">Linked Roles Verification</a>
+                    <a href="#/features">Bot Features</a>
+                    <a href="#/models">AI Models</a>
+                    <a href="#/interactions">Interactions</a>
                     <a href="#/tos">Terms of Service</a>
                     <a href="#/privacy">Privacy Policy</a>
                 </div>
                 <div class="footer-meta">
-                    <p class="copyright">&copy; 2023 {{ORGANIZATION_NAME}}. All rights reserved.</p>
-                    <p><a href="mailto:{{SUPPORT_EMAIL}}">Contact Support</a> | <a href="#accessibility">Accessibility Statement</a></p>
+                    <p class="copyright">&copy; 2023 AI Discord Bot with PuterClient Integration. All rights reserved.</p>
+                    <p><a href="mailto:support@example.com">Contact Support</a> | <a href="#accessibility">Accessibility</a></p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Connect Modal -->
+    <!-- Invite Bot Modal -->
     <div class="modal" id="connect-modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modal-title">Connect Your Discord App</h2>
+                <h2 id="modal-title">Invite AI Bot to Your Server</h2>
                 <button class="modal-close" aria-label="Close modal">&times;</button>
             </div>
             <div class="modal-body">
-                <p>To connect your Discord application:</p>
+                <p>To invite the AI bot to your Discord server:</p>
                 <ol>
                     <li>Visit the <a href="https://discord.com/developers/applications" target="_blank">Discord Developer Portal</a></li>
-                    <li>Select your application or create a new one</li>
-                    <li>Navigate to the "OAuth2" section</li>
-                    <li>Configure your redirect URIs and copy your Client ID</li>
-                    <li>Use the configuration pages in this dashboard to set up your endpoints</li>
+                    <li>Select your application</li>
+                    <li>Navigate to "OAuth2" → "URL Generator"</li>
+                    <li>Select these scopes: <code>bot</code>, <code>applications.commands</code></li>
+                    <li>Select these permissions: <code>Send Messages</code>, <code>Read Messages</code>, <code>Manage Messages</code>, <code>Embed Links</code></li>
+                    <li>Copy the generated URL and share it</li>
                 </ol>
                 <div class="warning-box">
-                    <strong>Security Notice:</strong> Never share your Client Secret or Bot Token publicly. All secrets should be stored securely on your server.
+                    <strong>Security Notice:</strong> Keep your bot token secure. Never commit it to public repositories. Store it in environment variables or secure configuration files.
+                </div>
+                <div class="info-box">
+                    <strong>Environment Setup:</strong> Use <code>.env</code> file with <code>DISCORD_TOKEN=your_bot_token_here</code>
                 </div>
             </div>
         </div>

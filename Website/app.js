@@ -7,8 +7,37 @@
     const state = {
         currentRoute: '/',
         theme: localStorage.getItem('theme') || 'light',
-        interactionsEndpoint: localStorage.getItem('interactionsEndpoint') || 'https://example.local/api/interactions',
-        verificationUrl: localStorage.getItem('verificationUrl') || 'https://example.local/verify-user'
+        interactionsEndpoint: localStorage.getItem('interactionsEndpoint') || 'https://your-bot-api.com/interactions',
+        models: {
+            deepseek: [
+                { name: "DeepSeek Chat", id: "deepseek-chat" },
+                { name: "DeepSeek DeepThink", id: "deepseek-reasoner" }
+            ],
+            chatgpt: [
+                { name: "GPT-5", id: "gpt-5.1" },
+                { name: "GPT-4", id: "gpt-4o" }
+            ],
+            claude: [
+                { name: "Claude Opus", id: "claude-opus-4-5-latest" },
+                { name: "Claude Haiku", id: "claude-haiku-4.5" },
+                { name: "Claude Sonnet", id: "claude-sonnet-4.5" }
+            ],
+            grok: [
+                { name: "Grok 3", id: "grok-3" },
+                { name: "Grok Fast", id: "grok-3-fast" },
+                { name: "Grok Mini", id: "grok-3-mini" },
+                { name: "Grok Mini Fast", id: "grok-3-mini-fast" }
+            ],
+            gemini: [
+                { name: "Gemini Flash", id: "gemini-2.5-flash" },
+                { name: "Gemini Flash Lite", id: "gemini-2.5-flash-lite" },
+                { name: "Gemini Pro", id: "gemini-2.5-pro" }
+            ],
+            qwen: [
+                { name: "Qwen thinking", id: "openrouter:qwen/qwen3-vl-8b-thinking" },
+                { name: "Qwen instruct", id: "openrouter:qwen/qwen3-vl-8b-instruct" }
+            ]
+        }
     };
     
     // DOM Elements
@@ -52,6 +81,11 @@
         
         // Handle hash changes for routing
         window.addEventListener('hashchange', handleHashChange);
+        
+        // Handle initial hash
+        if (window.location.hash) {
+            handleHashChange();
+        }
     }
     
     // Mobile menu functionality
@@ -88,7 +122,6 @@
     
     // Routing functionality
     function setupRouting() {
-        // Set initial route from hash or default to home
         const hash = window.location.hash.slice(1) || '/';
         state.currentRoute = hash;
         updateActiveNavLink(hash);
@@ -121,8 +154,11 @@
             case '/interactions':
                 content = renderInteractions();
                 break;
-            case '/linked-roles':
-                content = renderLinkedRoles();
+            case '/features':
+                content = renderFeatures();
+                break;
+            case '/models':
+                content = renderModels();
                 break;
             case '/tos':
                 content = renderTOS();
@@ -139,56 +175,45 @@
         // Attach event listeners for dynamic content
         if (route === '/interactions') {
             attachInteractionsListeners();
-        } else if (route === '/linked-roles') {
-            attachLinkedRolesListeners();
         } else if (route === '/') {
             attachHomeListeners();
         }
         
-        // Re-initialize copy buttons for code blocks
+        // Initialize copy buttons
         initCopyButtons();
+        
+        // Scroll to top on route change
+        window.scrollTo(0, 0);
     }
     
     // Home page rendering
     function renderHome() {
         return `
             <section class="hero">
-                <h1 class="hero-title">Discord App — Developer Console & Links</h1>
-                <p class="hero-subtitle">Configure and manage your Discord application endpoints, linked roles verification, and legal documentation in one place.</p>
+                <h1 class="hero-title">AI Discord Bot with PuterClient</h1>
+                <p class="hero-subtitle">A powerful Discord bot featuring multiple AI models, comprehensive logging, and intelligent command handling. Built with Python and PuterClient for seamless AI integration.</p>
                 
                 <div class="features">
                     <div class="feature-card">
-                        <div class="feature-icon">🔒</div>
-                        <h3 class="feature-title">Secure Endpoints</h3>
-                        <p class="feature-description">Configure and test your interactions endpoint with proper security validation and signature verification.</p>
+                        <div class="feature-icon">🤖</div>
+                        <h3 class="feature-title">Multiple AI Models</h3>
+                        <p class="feature-description">Access DeepSeek, GPT-4, Claude, Grok, Gemini, and Qwen models through a single bot interface with PuterClient integration.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">🔗</div>
-                        <h3 class="feature-title">Role Linking</h3>
-                        <p class="feature-description">Set up linked roles verification to enable role assignment based on external criteria and user verification.</p>
+                        <div class="feature-icon">📝</div>
+                        <h3 class="feature-title">Comprehensive Logging</h3>
+                        <p class="feature-description">Detailed message logging with timestamps, server/channel info, and user data for moderation and analytics.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">⚖️</div>
-                        <h3 class="feature-title">Legal & Privacy</h3>
-                        <p class="feature-description">Manage your Terms of Service and Privacy Policy with professional templates and easy customization.</p>
+                        <div class="feature-icon">💬</div>
+                        <h3 class="feature-title">DM & Command Support</h3>
+                        <p class="feature-description">Respond to DMs automatically and support hybrid commands with both text and slash command interfaces.</p>
                     </div>
                 </div>
                 
-                <div class="preview-panel">
-                    <h3 class="preview-title">Interactions Endpoint Preview</h3>
-                    <div class="url-input-group">
-                        <input type="text" class="url-input" id="preview-url" 
-                               value="${state.interactionsEndpoint}" 
-                               placeholder="https://example.local/api/interactions">
-                        <button class="btn btn-primary" id="update-preview">Update Preview</button>
-                    </div>
-                    <div class="code-block">
-                        <button class="copy-btn" data-target="preview-curl">Copy</button>
-                        <pre id="preview-curl">curl -X POST \\\n  "${state.interactionsEndpoint}" \\\n  --header "Content-Type: application/json" \\\n  --header "Authorization: Bearer &lt;YOUR_BOT_TOKEN&gt;" \\\n  --data '{\n    "type": 1,\n    "token": "{{INTERACTION_TOKEN}}",\n    "member": {\n      "user": {\n        "id": "{{USER_ID}}"\n      }\n    }\n  }'</pre>
-                    </div>
-                    <div class="warning-box">
-                        <strong>Security Warning:</strong> This is a preview only. Do not paste real tokens or secrets. All interactions should be validated server-side.
-                    </div>
+                <div class="info-box">
+                    <h3>Quick Start</h3>
+                    <p>To set up your bot, you need to configure your Discord token and use the PuterClient for AI model access. Check the "Bot Features" page for detailed setup instructions.</p>
                 </div>
             </section>
         `;
@@ -198,140 +223,274 @@
     function renderInteractions() {
         return `
             <section class="page-content">
-                <h1>Interactions Endpoint</h1>
-                <p>Configure your Discord application to receive interactions via HTTP POSTs instead of through the Gateway.</p>
+                <h1>Discord Interactions & Webhooks</h1>
+                <p>Configure your bot's interaction endpoints and webhooks for receiving Discord events and commands.</p>
                 
                 <div class="warning-box">
-                    <strong>Important:</strong> Never paste real tokens or secrets into this form. This is for preview and testing purposes only.
+                    <strong>⚠️ Security Warning:</strong> Never expose your bot token or Puter.com credentials. Store them securely in environment variables.
                 </div>
+                
+                <h2>Bot Configuration Example</h2>
+                <p>Your bot uses the following configuration structure:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" data-target="config-example">Copy</button>
+                    <pre id="config-example"># .env file (DO NOT COMMIT THIS)
+DISCORD_TOKEN=your_discord_bot_token_here
+
+# Bot Configuration
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+token = os.getenv('DISCORD_TOKEN')
+
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+
+bot = commands.Bot(command_prefix='§', intents=intents)</pre>
+                </div>
+                
+                <h2>Interaction Endpoint Setup</h2>
+                <p>For receiving interactions via HTTP POST instead of Gateway:</p>
                 
                 <form id="interactions-form">
                     <div class="form-group">
                         <label for="endpoint-url" class="form-label">Interactions Endpoint URL</label>
                         <input type="url" id="endpoint-url" class="form-input" 
                                value="${state.interactionsEndpoint}" 
-                               placeholder="https://example.local/api/interactions">
+                               placeholder="https://your-bot-api.com/interactions">
                     </div>
                     
-                    <div class="form-group">
-                        <label for="method-select" class="form-label">HTTP Method</label>
-                        <select id="method-select" class="form-select">
-                            <option value="POST" selected>POST</option>
-                            <option value="GET">GET</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-checkbox">
-                        <input type="checkbox" id="placeholder-only" checked>
-                        <label for="placeholder-only">Use placeholder only — do not call external servers</label>
-                    </div>
-                    
-                    <button type="button" class="btn btn-primary" id="save-interactions">Save Preview</button>
+                    <button type="button" class="btn btn-primary" id="save-interactions">Save Configuration</button>
                 </form>
                 
-                <div id="curl-preview" class="code-block" style="margin-top: 2rem; display: none;">
-                    <button class="copy-btn" data-target="generated-curl">Copy</button>
-                    <pre id="generated-curl"></pre>
+                <h2>Sample Bot Event Handler</h2>
+                <div class="code-block">
+                    <button class="copy-btn" data-target="event-handler">Copy</button>
+                    <pre id="event-handler">@bot.event
+async def on_ready():
+    print(f'Logged on as {bot.user.name}')
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e:
+        print(f"Failed to sync commands: {e}")
+
+@bot.event
+async def on_message(message):
+    # Log all messages
+    log_message(message)
+    
+    if message.author.bot:
+        return
+    
+    # Respond to DMs automatically
+    if message.guild is None and message.author != bot.user:
+        response = await deepseek(message.content, "deepseek-chat")
+        await message.channel.send(response)
+    
+    await bot.process_commands(message)</pre>
                 </div>
                 
-                <h2 style="margin-top: 3rem;">Sample Request & Response</h2>
-                <p>Below is an example of what your server might receive and should respond with:</p>
+                <h2>Security Best Practices</h2>
+                <ul>
+                    <li>Store tokens in environment variables, never in source code</li>
+                    <li>Use HTTPS for all endpoints</li>
+                    <li>Implement proper error handling and logging</li>
+                    <li>Validate all incoming interactions</li>
+                    <li>Use rate limiting to prevent abuse</li>
+                    <li>Regularly update dependencies</li>
+                </ul>
+            </section>
+        `;
+    }
+    
+    // Features page rendering
+    function renderFeatures() {
+        return `
+            <section class="page-content">
+                <h1>Bot Features & Commands</h1>
+                <p>Your Discord bot includes comprehensive features for AI interaction, moderation, and user management.</p>
                 
-                <div class="code-block">
-                    <button class="copy-btn" data-target="sample-request">Copy</button>
-                    <pre id="sample-request">// Sample Interaction Request\n{\n  "type": 2,\n  "token": "{{INTERACTION_TOKEN}}",\n  "member": {\n    "user": {\n      "id": "{{USER_ID}}",\n      "username": "{{USERNAME}}",\n      "avatar": "{{AVATAR}}",\n      "discriminator": "{{DISCRIMINATOR}}"\n    },\n    "roles": ["{{ROLE_ID}}"],\n    "permissions": "{{PERMISSIONS}}"\n  },\n  "id": "{{INTERACTION_ID}}",\n  "guild_id": "{{GUILD_ID}}",\n  "channel_id": "{{CHANNEL_ID}}",\n  "data": {\n    "name": "command_name",\n    "id": "{{COMMAND_ID}}",\n    "options": []\n  }\n}</pre>
+                <div class="command-list">
+                    <div class="command-item">
+                        <h3 class="command-name">/ask [prompt] [model]</h3>
+                        <p class="command-description">Ask the AI to generate text using the specified model. Supports all major AI providers.</p>
+                        <div class="command-usage">/ask "What is quantum computing?" model:gpt-4o</div>
+                    </div>
+                    
+                    <div class="command-item">
+                        <h3 class="command-name">/senddm [user] [message]</h3>
+                        <p class="command-description">Send a direct message to a specified user. Supports user ID, mention, or username#discriminator.</p>
+                        <div class="command-usage">/senddm @username Hello! This is a direct message.</div>
+                    </div>
+                    
+                    <div class="command-item">
+                        <h3 class="command-name">§reply [message]</h3>
+                        <p class="command-description">Text command prefix response using the default AI model.</p>
+                        <div class="command-usage">§reply What's the weather like today?</div>
+                    </div>
                 </div>
                 
+                <h2>Key Features</h2>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Message Logging</h3>
+                        <p class="feature-description">All messages are logged with timestamps, server info, channel details, and user information for complete audit trails.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3 class="feature-title">AI Integration</h3>
+                        <p class="feature-description">Seamless integration with PuterClient for accessing multiple AI models with intelligent response handling.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3 class="feature-title">Error Handling</h3>
+                        <p class="feature-description">Comprehensive error handling with file-based responses for long messages and proper Discord permission checks.</p>
+                    </div>
+                </div>
+                
+                <h2>DeepSeek Function Integration</h2>
                 <div class="code-block">
-                    <button class="copy-btn" data-target="sample-response">Copy</button>
-                    <pre id="sample-response">// Sample Interaction Response\n{\n  "type": 4,\n  "data": {\n    "content": "Hello, world!",\n    "embeds": [],\n    "components": []\n  }\n}</pre>
+                    <button class="copy-btn" data-target="deepseek-function">Copy</button>
+                    <pre id="deepseek-function">async def deepseek(set_prompt, set_model):
+    async with PuterClient() as client:
+        # Login to Puter.com
+        await client.login("your_username", "your_password")
+        
+        # AI Chat with selected model
+        result = await client.ai_chat(
+            prompt=set_prompt,
+            options={
+                "model": set_model if set_model else "gpt-4o",
+                "stream": False
+            }
+        )
+        
+        return result["response"]["result"]["message"]["content"]</pre>
                 </div>
                 
                 <div class="warning-box">
-                    <h3>Security Recommendations</h3>
+                    <h3>Important Security Notes</h3>
                     <ul>
-                        <li>Always verify interaction signatures using the <code>X-Signature-Ed25519</code> and <code>X-Signature-Timestamp</code> headers</li>
-                        <li>Validate that timestamps are recent to prevent replay attacks</li>
-                        <li>Never trust user input without validation</li>
-                        <li>Store your public key securely and use it to verify requests</li>
-                        <li>Respond to PING interactions with PONG (type 1) immediately</li>
+                        <li>Never hardcode Puter.com credentials in your bot code</li>
+                        <li>Use environment variables or secure credential storage</li>
+                        <li>Implement proper rate limiting for API calls</li>
+                        <li>Monitor usage to prevent API abuse</li>
                     </ul>
                 </div>
             </section>
         `;
     }
     
-    // Linked Roles page rendering
-    function renderLinkedRoles() {
+    // Models page rendering
+    function renderModels() {
         return `
             <section class="page-content">
-                <h1>Linked Roles Verification</h1>
-                <p>Configure role verification URLs to enable your application as a requirement in server role settings.</p>
+                <h1>Supported AI Models</h1>
+                <p>Your bot supports multiple AI providers through PuterClient integration. Choose from various models for different use cases.</p>
                 
-                <form id="linked-roles-form">
-                    <div class="form-group">
-                        <label for="verification-url" class="form-label">Verification URL</label>
-                        <input type="url" id="verification-url" class="form-input" 
-                               value="${state.verificationUrl}" 
-                               placeholder="https://example.local/verify-user">
-                    </div>
-                    
-                    <button type="button" class="btn btn-primary" id="save-verification">Save Preview</button>
-                </form>
-                
-                <h2>How Linked Roles Work</h2>
-                <p>Linked Roles allow server administrators to require users to link their accounts with your application to gain specific roles.</p>
-                
-                <div style="background: var(--bg-secondary); padding: var(--space-lg); border-radius: var(--radius-lg); margin: var(--space-lg) 0;">
-                    <h3 style="margin-top: 0;">User Flow:</h3>
-                    <ol>
-                        <li>User attempts to join a server or access role-restricted content</li>
-                        <li>Discord redirects the user to your verification URL with OAuth2 parameters</li>
-                        <li>Your application authenticates the user and checks eligibility</li>
-                        <li>If eligible, redirect back to Discord with an access token</li>
-                        <li>Discord grants the user the appropriate role</li>
-                    </ol>
+                <h2>DeepSeek Models</h2>
+                <div class="models-grid">
+                    ${state.models.deepseek.map(model => `
+                        <div class="model-card">
+                            <div class="model-name">${model.name}</div>
+                            <div class="model-id">${model.id}</div>
+                        </div>
+                    `).join('')}
                 </div>
                 
-                <h2>Example Verification Payload</h2>
-                <p>When Discord redirects to your verification URL, you'll receive query parameters like:</p>
+                <h2>ChatGPT Models</h2>
+                <div class="models-grid">
+                    ${state.models.chatgpt.map(model => `
+                        <div class="model-card">
+                            <div class="model-name">${model.name}</div>
+                            <div class="model-id">${model.id}</div>
+                        </div>
+                    `).join('')}
+                </div>
                 
+                <h2>Claude Models</h2>
+                <div class="models-grid">
+                    ${state.models.claude.map(model => `
+                        <div class="model-card">
+                            <div class="model-name">${model.name}</div>
+                            <div class="model-id">${model.id}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <h2>Grok Models</h2>
+                <div class="models-grid">
+                    ${state.models.grok.map(model => `
+                        <div class="model-card">
+                            <div class="model-name">${model.name}</div>
+                            <div class="model-id">${model.id}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <h2>Gemini Models</h2>
+                <div class="models-grid">
+                    ${state.models.gemini.map(model => `
+                        <div class="model-card">
+                            <div class="model-name">${model.name}</div>
+                            <div class="model-id">${model.id}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <h2>Qwen Models</h2>
+                <div class="models-grid">
+                    ${state.models.qwen.map(model => `
+                        <div class="model-card">
+                            <div class="model-name">${model.name}</div>
+                            <div class="model-id">${model.id}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <h2>Model Selection Example</h2>
                 <div class="code-block">
-                    <button class="copy-btn" data-target="verification-payload">Copy</button>
-                    <pre id="verification-payload">// OAuth2 Query Parameters\n{\n  "client_id": "{{CLIENT_ID}}",\n  "redirect_uri": "https://discord.com/oauth2/authorize",\n  "response_type": "code",\n  "scope": "role_connections.write identify",\n  "state": "{{RANDOM_STATE}}",\n  "prompt": "consent",\n  "code_challenge": "{{CODE_CHALLENGE}}",\n  "code_challenge_method": "S256"\n}</pre>
+                    <button class="copy-btn" data-target="model-usage">Copy</button>
+                    <pre id="model-usage">@bot.hybrid_command(name="ask", description="Ask the AI to generate text or create an image")
+@app_commands.choices(model=[
+    app_commands.Choice(name="DeepSeek Chat", value="deepseek-chat"),
+    app_commands.Choice(name="GPT-4", value="gpt-4o"),
+    app_commands.Choice(name="Claude Opus", value="claude-opus-4-5-latest"),
+    # ... more models
+])
+async def ask(ctx, user_prompt: str, model: app_commands.Choice[str] = None):
+    model_value = model.value if model else None
+    response = await deepseek(user_prompt, model_value)
+    
+    if len(response) > 2000:
+        # Send as file if response is too long
+        filename = f"response_{timestamp}.txt"
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(response)
+        await ctx.send(file=discord.File(filename))
+        os.remove(filename)
+    else:
+        embed = discord.Embed(title="AI Response", description=response)
+        if model:
+            embed.set_footer(text=f"Model: {model}")
+        await ctx.send(embed=embed)</pre>
                 </div>
                 
-                <h2>Verification Flow Diagram</h2>
-                <div style="display: flex; flex-direction: column; gap: var(--space-md); margin: var(--space-lg) 0;">
-                    <div style="background: var(--bg-secondary); padding: var(--space-md); border-radius: var(--radius-md); text-align: center;">
-                        User clicks role requirement
-                    </div>
-                    <div style="text-align: center;">↓</div>
-                    <div style="background: var(--bg-secondary); padding: var(--space-md); border-radius: var(--radius-md); text-align: center;">
-                        Discord redirects to your verification URL
-                    </div>
-                    <div style="text-align: center;">↓</div>
-                    <div style="background: var(--bg-secondary); padding: var(--space-md); border-radius: var(--radius-md); text-align: center;">
-                        Your server validates user and criteria
-                    </div>
-                    <div style="text-align: center;">↓</div>
-                    <div style="background: var(--bg-secondary); padding: var(--space-md); border-radius: var(--radius-md); text-align: center;">
-                        Redirect back to Discord with metadata
-                    </div>
-                    <div style="text-align: center;">↓</div>
-                    <div style="background: var(--bg-secondary); padding: var(--space-md); border-radius: var(--radius-md); text-align: center;">
-                        Role is assigned to user
-                    </div>
-                </div>
-                
-                <div class="warning-box">
-                    <h3>Security Considerations</h3>
+                <div class="info-box">
+                    <h3>Model Recommendations</h3>
                     <ul>
-                        <li>Implement proper OAuth2 flow with state parameter validation</li>
-                        <li>Only request the minimum scopes needed for verification</li>
-                        <li>Store user data securely and respect privacy</li>
-                        <li>Implement rate limiting to prevent abuse</li>
-                        <li>Use HTTPS for all verification endpoints</li>
+                        <li><strong>General Chat:</strong> DeepSeek Chat or GPT-4o</li>
+                        <li><strong>Reasoning Tasks:</strong> DeepSeek DeepThink or Claude Opus</li>
+                        <li><strong>Fast Responses:</strong> Claude Haiku or Grok Fast</li>
+                        <li><strong>Creative Writing:</strong> Claude Sonnet or Gemini Pro</li>
                     </ul>
                 </div>
             </section>
@@ -340,9 +499,11 @@
     
     // Terms of Service page rendering
     function renderTOS() {
+        const currentDate = new Date().toISOString().split('T')[0];
+        
         return `
             <section class="page-content">
-                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: var(--space-xl);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
                     <h1>Terms of Service</h1>
                     <button class="btn btn-secondary" onclick="window.print()">Print / Save as PDF</button>
                 </div>
@@ -350,62 +511,70 @@
                 <article>
                     <section>
                         <h2>1. Introduction</h2>
-                        <p>Welcome to {{ORGANIZATION_NAME}} ("we," "our," or "us"). These Terms of Service ("Terms") govern your use of our Discord application and related services (collectively, the "Service").</p>
-                        <p>By using our Service, you agree to be bound by these Terms. If you disagree with any part of the Terms, you may not access the Service.</p>
+                        <p>These Terms of Service govern your use of the AI Discord Bot ("the Bot"). By using the Bot, you agree to these terms.</p>
                     </section>
                     
                     <section>
-                        <h2>2. Acceptance of Terms</h2>
-                        <p>By accessing or using our Service, you confirm that you can form a binding contract with us, that you accept these Terms, and that you agree to comply with them. Your access to and use of the Service is also subject to our Privacy Policy.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>3. Description of Service</h2>
-                        <p>Our Service provides Discord integration features including but not limited to:</p>
+                        <h2>2. Description of Service</h2>
+                        <p>The Bot provides AI-powered chat functionality through Discord, including:</p>
                         <ul>
-                            <li>Custom Discord application commands and interactions</li>
-                            <li>Linked roles verification and assignment</li>
-                            <li>Server management tools</li>
-                            <li>User authentication and authorization services</li>
-                        </ul>
-                        <p>We reserve the right to modify, suspend, or discontinue the Service (or any part of it) at any time with or without notice.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>4. User Obligations and Prohibited Conduct</h2>
-                        <p>You agree not to use the Service to:</p>
-                        <ul>
-                            <li>Violate any applicable laws, regulations, or third-party rights</li>
-                            <li>Distribute malware, viruses, or other harmful code</li>
-                            <li>Spam, harass, or abuse other users</li>
-                            <li>Impersonate any person or entity</li>
-                            <li>Attempt to gain unauthorized access to any part of the Service</li>
-                            <li>Reverse engineer, decompile, or disassemble any portion of the Service</li>
-                            <li>Use the Service for any illegal or unauthorized purpose</li>
+                            <li>AI model integration (DeepSeek, GPT-4, Claude, etc.) via PuterClient</li>
+                            <li>Message logging and audit capabilities</li>
+                            <li>Direct message responses</li>
+                            <li>Command-based interactions</li>
                         </ul>
                     </section>
                     
                     <section>
-                        <h2>5. Third-Party Services and Integrations</h2>
-                        <p>Our Service integrates with Discord Inc.'s platform. Your use of Discord is subject to Discord's own Terms of Service and Privacy Policy. We are not responsible for Discord's services or any issues arising from your use of Discord.</p>
-                        <p>When you use our Service through Discord, we may receive certain information from Discord as described in our Privacy Policy.</p>
+                        <h2>3. User Responsibilities</h2>
+                        <p>Users agree not to:</p>
+                        <ul>
+                            <li>Use the Bot for illegal activities</li>
+                            <li>Generate harmful, abusive, or offensive content</li>
+                            <li>Attempt to bypass security measures</li>
+                            <li>Overload the Bot with excessive requests</li>
+                            <li>Share or distribute the Bot's credentials</li>
+                        </ul>
                     </section>
                     
                     <section>
-                        <h2>6. Liability Limitations and Disclaimers</h2>
-                        <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMISSIBLE PURSUANT TO APPLICABLE LAW, WE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED.</p>
-                        <p>IN NO EVENT SHALL WE BE LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE SERVICE.</p>
+                        <h2>4. Data Handling</h2>
+                        <p>The Bot logs messages for moderation purposes. Logs include:</p>
+                        <ul>
+                            <li>Message content</li>
+                            <li>User information</li>
+                            <li>Server and channel details</li>
+                            <li>Timestamps</li>
+                        </ul>
+                        <p>Logs are stored locally and used solely for moderation and debugging.</p>
                     </section>
                     
                     <section>
-                        <h2>7. Changes to Terms</h2>
-                        <p>We reserve the right to modify these Terms at any time. If we make changes, we will provide notice through the Service or by other means. Your continued use of the Service after any modification constitutes your acceptance of the new Terms.</p>
+                        <h2>5. AI Model Usage</h2>
+                        <p>The Bot uses third-party AI services via PuterClient. These services have their own terms:</p>
+                        <ul>
+                            <li>OpenAI Terms of Service</li>
+                            <li>Anthropic Claude Terms</li>
+                            <li>Google Gemini Terms</li>
+                            <li>DeepSeek Terms of Service</li>
+                        </ul>
                     </section>
                     
                     <section>
-                        <h2>8. Contact Information</h2>
-                        <p>If you have any questions about these Terms, please contact us at {{SUPPORT_EMAIL}}.</p>
-                        <p><strong>Effective Date:</strong> ${new Date().toISOString().split('T')[0]}</p>
+                        <h2>6. Limitation of Liability</h2>
+                        <p>The Bot is provided "as is" without warranties. We are not responsible for:</p>
+                        <ul>
+                            <li>AI-generated content accuracy</li>
+                            <li>Service interruptions</li>
+                            <li>Third-party API limitations</li>
+                            <li>User misuse of the Bot</li>
+                        </ul>
+                    </section>
+                    
+                    <section>
+                        <h2>7. Contact Information</h2>
+                        <p>For questions about these terms, contact: support@example.com</p>
+                        <p><strong>Effective Date:</strong> ${currentDate}</p>
                     </section>
                 </article>
             </section>
@@ -414,101 +583,92 @@
     
     // Privacy Policy page rendering
     function renderPrivacy() {
+        const currentDate = new Date().toISOString().split('T')[0];
+        
         return `
             <section class="page-content">
-                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: var(--space-xl);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
                     <h1>Privacy Policy</h1>
                     <button class="btn btn-secondary" onclick="window.print()">Print / Save as PDF</button>
                 </div>
                 
                 <article>
                     <section>
-                        <h2>1. Introduction</h2>
-                        <p>This Privacy Policy explains how {{ORGANIZATION_NAME}} ("we," "our," or "us") collects, uses, and protects your information when you use our Discord application and related services (the "Service").</p>
-                        <p>We are committed to protecting your privacy and handling your data transparently and securely.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>2. Information We Collect</h2>
-                        <p>We collect minimal information necessary to provide the Service:</p>
+                        <h2>1. Data Collection</h2>
+                        <p>The Bot collects minimal data necessary for operation:</p>
                         <ul>
-                            <li><strong>Discord User Information:</strong> When you interact with our Service through Discord, we may receive your Discord user ID, username, discriminator, avatar, and server information.</li>
-                            <li><strong>Interaction Data:</strong> We may log command usage, timestamps, and server IDs to maintain and improve the Service.</li>
-                            <li><strong>Technical Information:</strong> We may collect IP addresses, browser type, and other technical data for security and analytics purposes.</li>
+                            <li><strong>Message Content:</strong> For AI processing and logging</li>
+                            <li><strong>User Information:</strong> User ID, username, discriminator</li>
+                            <li><strong>Server Information:</strong> Server ID, server name</li>
+                            <li><strong>Channel Information:</strong> Channel ID, channel name</li>
+                            <li><strong>Timestamps:</strong> Message and interaction times</li>
                         </ul>
                     </section>
                     
                     <section>
-                        <h2>3. How We Use Your Information</h2>
-                        <p>We use the information we collect to:</p>
+                        <h2>2. Data Usage</h2>
+                        <p>Collected data is used for:</p>
                         <ul>
-                            <li>Provide, maintain, and improve the Service</li>
-                            <li>Process your commands and interactions</li>
-                            <li>Verify user identities for linked roles</li>
-                            <li>Ensure the security and integrity of the Service</li>
-                            <li>Comply with legal obligations</li>
-                        </ul>
-                        <p>We do not sell your personal information to third parties.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>4. Data Retention</h2>
-                        <p>We retain your information only for as long as necessary to fulfill the purposes outlined in this Privacy Policy. Typically, we retain:</p>
-                        <ul>
-                            <li>User data: While your account is active and for 30 days after deactivation</li>
-                            <li>Interaction logs: For up to 90 days for debugging and analytics</li>
-                            <li>Server configuration data: Until the server removes our application</li>
+                            <li>Providing AI chat functionality</li>
+                            <li>Message logging for moderation</li>
+                            <li>Command processing and response generation</li>
+                            <li>Debugging and service improvement</li>
                         </ul>
                     </section>
                     
                     <section>
-                        <h2>5. Data Sharing and Third Parties</h2>
-                        <p>We may share your information in the following circumstances:</p>
+                        <h2>3. Data Storage</h2>
+                        <p>Data is stored:</p>
                         <ul>
-                            <li><strong>With Discord:</strong> As necessary to provide the Service through their platform</li>
-                            <li><strong>Service Providers:</strong> With trusted third parties who assist us in operating our Service</li>
-                            <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
+                            <li><strong>Logs:</strong> Stored locally in log files</li>
+                            <li><strong>Duration:</strong> Logs are retained for 30 days</li>
+                            <li><strong>Security:</strong> Local file storage with standard file permissions</li>
                         </ul>
-                        <p>We use appropriate contractual and technical safeguards with third parties who process data on our behalf.</p>
                     </section>
                     
                     <section>
-                        <h2>6. Your Rights</h2>
-                        <p>Depending on your jurisdiction, you may have the following rights regarding your personal information:</p>
+                        <h2>4. Third-Party Services</h2>
+                        <p>The Bot integrates with:</p>
                         <ul>
-                            <li><strong>Access:</strong> You can request a copy of the personal information we hold about you</li>
-                            <li><strong>Correction:</strong> You can request correction of inaccurate information</li>
-                            <li><strong>Deletion:</strong> You can request deletion of your personal information</li>
-                            <li><strong>Portability:</strong> You can request your data in a structured, machine-readable format</li>
-                            <li><strong>Objection:</strong> You can object to certain processing of your information</li>
+                            <li><strong>Discord:</strong> For platform functionality</li>
+                            <li><strong>PuterClient:</strong> For AI model access</li>
+                            <li><strong>AI Providers:</strong> OpenAI, Anthropic, Google, etc.</li>
                         </ul>
-                        <p>To exercise these rights, please contact us at {{SUPPORT_EMAIL}}.</p>
+                        <p>These services have their own privacy policies.</p>
                     </section>
                     
                     <section>
-                        <h2>7. Security</h2>
-                        <p>We implement appropriate technical and organizational measures to protect your information against unauthorized access, alteration, disclosure, or destruction. However, no internet transmission is completely secure, and we cannot guarantee absolute security.</p>
+                        <h2>5. User Rights</h2>
+                        <p>Users have the right to:</p>
+                        <ul>
+                            <li>Request log deletion</li>
+                            <li>Opt-out of message logging</li>
+                            <li>Request data access</li>
+                            <li>File privacy concerns</li>
+                        </ul>
+                        <p>Contact: support@example.com for privacy requests.</p>
                     </section>
                     
                     <section>
-                        <h2>8. International Transfers</h2>
-                        <p>Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for such transfers as required by applicable law.</p>
+                        <h2>6. Security Measures</h2>
+                        <p>We implement:</p>
+                        <ul>
+                            <li>Secure credential storage</li>
+                            <li>Regular security updates</li>
+                            <li>Access logging</li>
+                            <li>Environment variable protection</li>
+                        </ul>
                     </section>
                     
                     <section>
-                        <h2>9. Children's Privacy</h2>
-                        <p>Our Service is not directed to individuals under the age of 13 (or other age as required by local law). We do not knowingly collect personal information from children. If we become aware that we have collected personal information from a child, we will take steps to delete such information.</p>
+                        <h2>7. Children's Privacy</h2>
+                        <p>The Bot is not intended for users under 13. We do not knowingly collect data from children.</p>
                     </section>
                     
                     <section>
-                        <h2>10. Changes to This Policy</h2>
-                        <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on our Service and updating the effective date.</p>
-                    </section>
-                    
-                    <section>
-                        <h2>11. Contact Us</h2>
-                        <p>If you have any questions about this Privacy Policy or our data practices, please contact us at {{SUPPORT_EMAIL}}.</p>
-                        <p><strong>Effective Date:</strong> ${new Date().toISOString().split('T')[0]}</p>
+                        <h2>8. Policy Updates</h2>
+                        <p>This policy may be updated. Continued Bot use constitutes acceptance of changes.</p>
+                        <p><strong>Effective Date:</strong> ${currentDate}</p>
                     </section>
                 </article>
             </section>
@@ -517,71 +677,18 @@
     
     // Event listeners for dynamic content
     function attachHomeListeners() {
-        const updatePreviewBtn = document.getElementById('update-preview');
-        const previewUrlInput = document.getElementById('preview-url');
-        
-        if (updatePreviewBtn && previewUrlInput) {
-            updatePreviewBtn.addEventListener('click', function() {
-                state.interactionsEndpoint = previewUrlInput.value;
-                localStorage.setItem('interactionsEndpoint', state.interactionsEndpoint);
-                
-                const curlElement = document.getElementById('preview-curl');
-                if (curlElement) {
-                    curlElement.textContent = curlElement.textContent.replace(
-                        /https?:\/\/[^\s]+/g, 
-                        state.interactionsEndpoint
-                    );
-                }
-                
-                // Show confirmation
-                showNotification('Preview updated successfully');
-            });
-        }
+        // No specific listeners needed for home page
     }
     
     function attachInteractionsListeners() {
         const saveBtn = document.getElementById('save-interactions');
         const endpointInput = document.getElementById('endpoint-url');
-        const methodSelect = document.getElementById('method-select');
-        const placeholderCheckbox = document.getElementById('placeholder-only');
         
         if (saveBtn && endpointInput) {
             saveBtn.addEventListener('click', function() {
                 state.interactionsEndpoint = endpointInput.value;
                 localStorage.setItem('interactionsEndpoint', state.interactionsEndpoint);
-                
-                // Generate curl command preview
-                const method = methodSelect.value;
-                const usePlaceholder = placeholderCheckbox.checked;
-                
-                const curlPreview = document.getElementById('curl-preview');
-                const generatedCurl = document.getElementById('generated-curl');
-                
-                if (curlPreview && generatedCurl) {
-                    let curlCommand = `curl -X ${method} \\\\\n  "${state.interactionsEndpoint}" \\\\\n  --header "Content-Type: application/json" \\\\\n  --header "Authorization: Bearer <YOUR_BOT_TOKEN>"`;
-                    
-                    if (method === 'POST') {
-                        curlCommand += ` \\\\\n  --data '{\n    "type": 1,\n    "token": "{{INTERACTION_TOKEN}}",\n    "member": {\n      "user": {\n        "id": "{{USER_ID}}"\n      }\n    }\n  }'`;
-                    }
-                    
-                    generatedCurl.textContent = curlCommand;
-                    curlPreview.style.display = 'block';
-                }
-                
-                showNotification('Interactions endpoint saved to preview');
-            });
-        }
-    }
-    
-    function attachLinkedRolesListeners() {
-        const saveBtn = document.getElementById('save-verification');
-        const verificationInput = document.getElementById('verification-url');
-        
-        if (saveBtn && verificationInput) {
-            saveBtn.addEventListener('click', function() {
-                state.verificationUrl = verificationInput.value;
-                localStorage.setItem('verificationUrl', state.verificationUrl);
-                showNotification('Verification URL saved to preview');
+                showNotification('Configuration saved successfully', 'success');
             });
         }
     }
@@ -596,33 +703,52 @@
                 if (targetElement) {
                     const textToCopy = targetElement.textContent;
                     
-                    navigator.clipboard.writeText(textToCopy).then(() => {
-                        const originalText = this.textContent;
-                        this.textContent = 'Copied!';
-                        
-                        setTimeout(() => {
-                            this.textContent = originalText;
-                        }, 2000);
-                    }).catch(err => {
-                        console.error('Failed to copy text: ', err);
-                        // Fallback for browsers that don't support clipboard API
-                        const textArea = document.createElement('textarea');
-                        textArea.value = textToCopy;
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                        
-                        const originalText = this.textContent;
-                        this.textContent = 'Copied!';
-                        
-                        setTimeout(() => {
-                            this.textContent = originalText;
-                        }, 2000);
-                    });
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            showCopyFeedback(this);
+                        }).catch(err => {
+                            console.error('Clipboard error:', err);
+                            fallbackCopy(this, textToCopy);
+                        });
+                    } else {
+                        fallbackCopy(this, textToCopy);
+                    }
                 }
             });
         });
+    }
+    
+    function showCopyFeedback(button) {
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        button.style.background = 'var(--secondary)';
+        button.style.color = 'white';
+        
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = '';
+            button.style.color = '';
+        }, 2000);
+    }
+    
+    function fallbackCopy(button, text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            showCopyFeedback(button);
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            button.textContent = 'Failed';
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
+        }
+        
+        document.body.removeChild(textArea);
     }
     
     // Notification system
@@ -636,30 +762,38 @@
         // Create new notification
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
-        notification.textContent = message;
+        notification.innerHTML = `
+            <div class="notification-content">
+                ${type === 'success' ? '✅' : '⚠️'} ${message}
+            </div>
+        `;
+        
+        // Add styles
         notification.style.cssText = `
             position: fixed;
             top: 100px;
             right: 20px;
-            background: ${type === 'error' ? 'var(--error)' : 'var(--success)'};
+            background: ${type === 'error' ? 'var(--error)' : 'var(--secondary)'};
             color: white;
             padding: var(--space-md) var(--space-lg);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             box-shadow: var(--shadow-lg);
             z-index: 1000;
-            transition: transform 0.3s ease;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
         `;
         
         document.body.appendChild(notification);
         
         // Animate in
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             notification.style.transform = 'translateX(0)';
-        }, 10);
+        });
         
         // Remove after 3 seconds
         setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
+            notification.style.transform = 'translateX(120%)';
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.parentNode.removeChild(notification);
@@ -674,4 +808,18 @@
     } else {
         init();
     }
+    
+    // Handle navigation clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.nav-link')) {
+            e.preventDefault();
+            const route = e.target.getAttribute('data-route');
+            window.location.hash = route;
+            
+            // Close mobile menu if open
+            if (navToggle.getAttribute('aria-expanded') === 'true') {
+                toggleMobileMenu();
+            }
+        }
+    });
 })();

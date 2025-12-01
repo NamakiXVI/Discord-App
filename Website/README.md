@@ -1,44 +1,36 @@
-# Discord App Documentation Site
+# AI Discord Bot Documentation
 
-A modern, accessible documentation and configuration site for Discord applications with client-side routing and interactive previews.
-
-## Security Notice
-
-⚠️ **IMPORTANT SECURITY INFORMATION**
-
-- This site is client-side only and does not provide server-side validation
-- Never paste real Discord tokens, client secrets, or private keys into any form
-- All endpoint testing is simulated using localStorage and mock data
-- Real implementations must handle signature verification and security on the server
+A comprehensive documentation site for your Discord AI bot featuring PuterClient integration, multiple AI models, and advanced logging capabilities.
 
 ## Features
 
-- Four main sections: Interactions Endpoint, Linked Roles Verification, Terms of Service, Privacy Policy
-- Client-side routing with History API
-- Responsive design with mobile navigation
-- Dark/light theme toggle
-- Copy-to-clipboard for code blocks
-- Print/save as PDF functionality
-- Accessible with proper ARIA labels and keyboard navigation
+- **Multiple AI Models**: DeepSeek, GPT-4, Claude, Grok, Gemini, and Qwen support
+- **Comprehensive Logging**: All messages logged with full context (timestamp, server, channel, user)
+- **Hybrid Commands**: Both slash commands and text command support
+- **DM Support**: Automatic responses to direct messages
+- **File Handling**: Auto-conversion to files for long responses (>2000 chars)
+- **Security**: Environment variable based configuration
 
-## Server-Side Responsibilities
+## Security Notes
 
-For production use, you must implement:
+⚠️ **CRITICAL SECURITY INFORMATION**
 
-1. Signature verification for Discord interactions
-2. Secure storage of tokens and secrets
-3. Proper OAuth2 flow for linked roles
-4. HTTPS for all endpoints
-5. Rate limiting and abuse prevention
+1. **Never commit credentials to version control**
+   - Store Discord tokens in `.env` files
+   - Use environment variables in production
+   - Add `.env` to `.gitignore`
 
-## Customization
+2. **Secure your Puter.com credentials**
+   - Never hardcode login credentials in bot code
+   - Consider using separate service accounts
+   - Monitor API usage for abuse
 
-Replace all `{{PLACEHOLDER}}` values with your actual information:
-- `{{ORGANIZATION_NAME}}`
-- `{{SUPPORT_EMAIL}}`
-- Endpoint URLs
-- Legal document details
+3. **Bot Permissions**
+   - Grant minimum required permissions
+   - Regularly audit bot access
+   - Use separate tokens for development/production
 
-## Browser Support
+## Quick Setup
 
-Works in modern browsers with ES6+ support. Includes fallbacks for older browsers where possible.
+1. Create a Discord bot application at https://discord.com/developers
+2. Copy the bot token to `.env` file:
